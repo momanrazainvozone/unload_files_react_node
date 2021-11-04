@@ -1,6 +1,5 @@
 const path = require("path");
 const express = require("express");
-const ejs = require("ejs");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const cors = require("cors");
@@ -17,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //==================={RENDER BUILD}======================\\
 
 app.use(express.static(path.join(__dirname, "build")));
-app.get("/", async (req, res) => {
+app.get("/", async (_req, res) => {
   res.sendFile(path.join());
 });
 
