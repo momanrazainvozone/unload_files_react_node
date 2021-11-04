@@ -16,8 +16,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Render front end
 //app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "build")));
-app.get("/",async (req, res) => {
-    res.sendFile(path.join());
+app.get("/", async (req, res) => {
+  res.sendFile(path.join());
 });
 
 // For Multer Storage
@@ -43,7 +43,7 @@ app.post(
   function (req, res) {
     const file = req.file;
     if (!file) {
-      return res.send("Please choose file to upload!");
+      return res.status(400).send("Please choose file to upload!");
     }
     req.app.locals.uploadStatus = true;
     return res.status(200).send({ message: "file uplaoded" });
@@ -61,35 +61,37 @@ app.post("/multipleFile", function (req, res) {
 });
 // GET file Paths
 app.get("/getfilepath", async (req, res) => {
-  const files = await read_files();
-  return res.status(200).send(files);
+  try {
+    const files = await read_files();
+    return res.status(200).send(files);
+  } catch (error) {
+    return res.status(400).send({ message: "Something went wrong" });
+  }
 });
 const read_files = async () => {
   let files_path = [];
-  var files = fs.readdirSync(__dirname+'/my_uploads');
+  var files = fs.readdirSync(__dirname + "/my_uploads");
   files.forEach((file) => {
-    files_path.push(String(__dirname +'/my_uploads'+"/"+ file));
+    files_path.push(String(__dirname + "/my_uploads" + "/" + file));
   });
   return files_path;
 };
 // delete file
-app.post("/delete_files",async (req,res)=>{
-    const files_path=req.body.files;
-    try {
-        const promise=files_path.map((x=>{
-            fs.unlink(x, function (err) {
-                // if no error, file has been deleted successfully
-                console.log('File deleted!');
-            });
-        })); 
-        await Promise.all(promise);
-        return res.status(200).send({message:"file deleted"});
-    } catch (error) {
-        return res.status(400).send({message:"Something went wrong"});
-    }
-
-   
-})
+app.post("/delete_files", async (req, res) => {
+  const files_path = req.body.files;
+  try {
+    files_path.map(async (x) => {
+      try {
+        await fs.unlinkSync(x);
+      } catch (error) {
+        return res.status(400).send({ message: "File not found" });
+      }
+    });
+    return res.status(200).send({ message: "file deleted" });
+  } catch (error) {
+    return res.status(400).send({ message: "Something went wrong" });
+  }
+});
 // Server Listening
 app.listen(5000, () => {
   console.log("Server is running at port 5000");
