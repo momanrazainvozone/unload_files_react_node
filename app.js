@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const cors = require("cors");
 const fs = require("fs");
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
@@ -93,6 +94,6 @@ app.post("/delete_files", async (req, res) => {
   }
 });
 // Server Listening
-app.listen(5000, () => {
-  console.log("Server is running at port 5000");
+app.listen(process.env.PORT || 5000, () => {
+  console.log("Server is running at port ", process.env.PORT);
 });
