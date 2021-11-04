@@ -7,21 +7,22 @@ const cors = require("cors");
 const fs = require("fs");
 require("dotenv").config();
 
+//==================={IMPORTS}======================\\
+
 const app = express();
 app.use(cors());
-//app.set("views", path.join(__dirname, "views"));
-//set view engine
-app.set("view engine", "ejs");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// Render front end
-//app.use(express.static("public"));
+
+//==================={RENDER BUILD}======================\\
+
 app.use(express.static(path.join(__dirname, "build")));
 app.get("/", async (req, res) => {
   res.sendFile(path.join());
 });
 
-// For Multer Storage
+//==================={MULTER}======================\\
+
 var multerStorage = multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, path.join(__dirname, "my_uploads"));
@@ -30,13 +31,19 @@ var multerStorage = multer.diskStorage({
     callback(null, Date.now() + "_" + file.originalname);
   },
 });
-// For Single File upload
+
+//==================={MULTER UPLOAD SINGLE}======================\\
+
 var multerSigleUpload = multer({ storage: multerStorage });
-// For Multiple File upload
+
+//==================={MULTER UPLOAD MULTIPLE}======================\\
+
 var multerMultipleUpload = multer({ storage: multerStorage }).array(
   "multipleImage",
   3
 );
+
+//==================={UPLOAD SINGLE FILE}======================\\
 
 app.post(
   "/singleFile",
@@ -50,7 +57,9 @@ app.post(
     return res.status(200).send({ message: "file uplaoded" });
   }
 );
-//route for multiple file upload
+
+//==================={UPLOAD MULTIPLE FILE}======================\\
+
 app.post("/multipleFile", function (req, res) {
   multerMultipleUpload(req, res, function (err) {
     if (err) {
@@ -60,7 +69,9 @@ app.post("/multipleFile", function (req, res) {
     res.redirect("/");
   });
 });
-// GET file Paths
+
+//==================={GET FILE PATH API}======================\\
+
 app.get("/getfilepath", async (req, res) => {
   try {
     const files = await read_files();
@@ -77,7 +88,9 @@ const read_files = async () => {
   });
   return files_path;
 };
-// delete file
+
+//==================={DELETE FILE API}======================\\
+
 app.post("/delete_files", async (req, res) => {
   const files_path = req.body.files;
   try {
@@ -93,7 +106,9 @@ app.post("/delete_files", async (req, res) => {
     return res.status(400).send({ message: "Something went wrong" });
   }
 });
-// Server Listening
+
+//==================={SERVER LISTENING}======================\\
+
 app.listen(process.env.PORT || 5000, () => {
   console.log("Server is running at port ", process.env.PORT);
 });
